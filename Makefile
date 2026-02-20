@@ -1,6 +1,6 @@
 CC = gcc
-CFLAGS = -Wall -O2 $(shell pkg-config --cflags libimobiledevice-1.0 libusbmuxd-2.0)
-LDFLAGS = $(shell pkg-config --libs libimobiledevice-1.0 libusbmuxd-2.0)
+CFLAGS = -Wall -O2 -pthread $(shell pkg-config --cflags libimobiledevice-1.0 libusbmuxd-2.0)
+LDFLAGS = -pthread $(shell pkg-config --libs libimobiledevice-1.0 libusbmuxd-2.0)
 
 TARGET = iproxy2vts
 SRCS = main.c notify.c iphone.c network.c bridge.c service.c
@@ -56,5 +56,8 @@ uninstall:
 	@systemctl --user daemon-reload
 	@echo "Uninstallation complete!"
 
-.PHONY: all clean install uninstall
+.PHONY: all clean install uninstall deb
+
+deb:
+	dpkg-buildpackage -us -uc -b
 

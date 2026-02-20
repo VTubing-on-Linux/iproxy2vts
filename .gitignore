@@ -1,0 +1,5 @@
+# Debian packaging
+debian/
+
+# GitHub folder
+.github/
