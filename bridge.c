@@ -15,8 +15,8 @@ void run_bridge(void) {
     int iphone = -1, server = -1;
     
     for (int i = 0; i < 10 && running; i++) {
-        if (iphone < 0) iphone = connect_nonblocking(IPHONE_PORT, 2000);
-        if (server < 0) server = connect_nonblocking(VTS_SERVER_PORT, 2000);
+        if (iphone < 0) iphone = connect_nonblocking(iphone_port, 2000);
+        if (server < 0) server = connect_nonblocking(vts_server_port, 2000);
         if (iphone >= 0 && server >= 0) break;
         usleep(200000);
     }
@@ -72,10 +72,6 @@ void run_bridge(void) {
                 }
                 sent += w;
             }
-
-            if (src == iphone) {
-               send(iphone, buf, r, 0); 
-            }
         }
     }
 
@@ -88,9 +84,10 @@ void run_bridge(void) {
 // tl;dr keep iphone connected even if vts is not ready yet 
 
 void drain_iphone_data(void) {
-    int iphone = connect_nonblocking(IPHONE_PORT, 2000);
+    int iphone = connect_nonblocking(iphone_port, 2000);
     if (iphone < 0) return;
 
+    
     LOGMSG_INFO("Draining iPhone data while waiting for VTS...");
 
     char buf[BUF_SIZE];

@@ -1,9 +1,10 @@
 CC = gcc
-CFLAGS = -Wall -O2 $(shell pkg-config --cflags libimobiledevice-1.0 libusbmuxd-2.0)
-LDFLAGS = $(shell pkg-config --libs libimobiledevice-1.0 libusbmuxd-2.0)
+PKGS = libimobiledevice-1.0 libusbmuxd-2.0 gtk+-3.0 ayatana-appindicator3-0.1
+CFLAGS = -Wall -O2 $(shell pkg-config --cflags $(PKGS)) -pthread
+LDFLAGS = $(shell pkg-config --libs $(PKGS)) -pthread
 
 TARGET = iproxy2vts
-SRCS = main.c notify.c iphone.c network.c bridge.c service.c
+SRCS = main.c config.c notify.c iphone.c network.c bridge.c service.c
 OBJS = $(SRCS:.c=.o)
 HDRS = config.h log.h notify.h iphone.h network.h bridge.h service.h
 SERVICE = iproxy2vts.service
@@ -56,5 +57,4 @@ uninstall:
 	@systemctl --user daemon-reload
 	@echo "Uninstallation complete!"
 
-.PHONY: all clean install uninstall
-
+.PHONY: all clean clear install uninstall

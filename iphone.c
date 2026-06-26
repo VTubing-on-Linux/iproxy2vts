@@ -1,3 +1,4 @@
+#include "config.h"
 #include "iphone.h"
 #include "log.h"
 
@@ -11,6 +12,8 @@
 #include <libimobiledevice/lockdown.h>
 
 static pid_t iproxy_pid = -1;
+static int iproxy_local_port = -1;
+static int iproxy_remote_port = -1;
 
 int iphone_connected_and_paired(void) {
     char **udids = NULL;
@@ -41,7 +44,13 @@ int iphone_connected_and_paired(void) {
 
 // will be eventually rewritten to use libimobiledevice directly
 void start_iproxy(void) {
-    if (iproxy_pid > 0) return;
+    if (iproxy_pid > 0) {
+        if (iproxy_local_port == iphone_port && iproxy_remote_port == iphone_port) {
+            return;
+        }
+
+        stop_iproxy();
+    }
 
     LOGMSG_INFO("Launching iproxy...");
     iproxy_pid = fork();
@@ -50,10 +59,19 @@ void start_iproxy(void) {
         dup2(null, STDOUT_FILENO);
         dup2(null, STDERR_FILENO);
         close(null);
-        execlp("iproxy", "iproxy", "25561", "25561", NULL);
+        char local_port[16];
+        char remote_port[16];
+        snprintf(local_port, sizeof(local_port), "%d", iphone_port);
+        snprintf(remote_port, sizeof(remote_port), "%d", iphone_port);
+        execlp("iproxy", "iproxy", local_port, remote_port, NULL);
         _exit(1);
     }
     usleep(500000); // Give it 0.5s to bind
+
+    if (iproxy_pid > 0) {
+        iproxy_local_port = iphone_port;
+        iproxy_remote_port = iphone_port;
+    }
 }
 
 void stop_iproxy(void) {
@@ -61,5 +79,7 @@ void stop_iproxy(void) {
         kill(iproxy_pid, SIGTERM);
         waitpid(iproxy_pid, NULL, 0);
         iproxy_pid = -1;
+        iproxy_local_port = -1;
+        iproxy_remote_port = -1;
     }
 }

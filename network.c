@@ -61,7 +61,7 @@ int connect_nonblocking(int port, int timeout_ms) {
 }
 
 int check_vts_available(void) {
-    int s = connect_nonblocking(VTS_SERVER_PORT, 1000);
+    int s = connect_nonblocking(vts_server_port, 1000);
     if (s >= 0) {
         close(s);
         return 1;
@@ -70,7 +70,7 @@ int check_vts_available(void) {
 }
 
 int probe_iphone_for_vts_data(int timeout_sec) {
-    int s = connect_nonblocking(IPHONE_PORT, 2000);
+    int s = connect_nonblocking(iphone_port, 2000);
     if (s < 0) return 0;
 
     fd_set readfds;
