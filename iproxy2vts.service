@@ -6,7 +6,7 @@ Wants=usbmuxd.service
 
 [Service]
 Type=simple
-ExecStart=%h/.local/bin/iproxy2vts -f
+ExecStart=/usr/bin/iproxy2vts -f
 Restart=on-failure
 RestartSec=5
 Environment=DISPLAY=:0
