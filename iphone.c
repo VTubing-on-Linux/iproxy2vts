@@ -119,12 +119,12 @@ static void *proxy_handler(void *arg) {
         return NULL;
     }
 
-    int dfd = usbmuxd_connect(dev->handle, IPHONE_PORT);
+    int dfd = usbmuxd_connect(dev->handle, iphone_port);
     free(dev_list);
 
     if (dfd < 0) {
         LOGMSG_ERR("iproxy: connect to device port %d failed: %s",
-                    IPHONE_PORT, strerror(-dfd));
+                iphone_port, strerror(-dfd));
         close(cfd);
         return NULL;
     }
@@ -222,7 +222,7 @@ static void *iproxy_listener(void *arg) {
 void start_iproxy(void) {
     if (iproxy_running) return;
 
-    LOGMSG_INFO("Starting built-in iproxy on port %d...", IPHONE_PORT);
+    LOGMSG_INFO("Starting built-in iproxy on port %d...", iphone_port);
 
     listen_fd = socket(AF_INET, SOCK_STREAM, 0);
     if (listen_fd < 0) {
@@ -235,12 +235,12 @@ void start_iproxy(void) {
 
     struct sockaddr_in addr = {
         .sin_family = AF_INET,
-        .sin_port   = htons(IPHONE_PORT),
+        .sin_port   = htons(iphone_port),
         .sin_addr.s_addr = inet_addr("127.0.0.1")
     };
 
     if (bind(listen_fd, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
-        LOGMSG_ERR("iproxy: bind port %d: %s", IPHONE_PORT, strerror(errno));
+        LOGMSG_ERR("iproxy: bind port %d: %s", iphone_port, strerror(errno));
         close(listen_fd);
         listen_fd = -1;
         return;
@@ -266,7 +266,7 @@ void start_iproxy(void) {
         return;
     }
 
-    LOGMSG_OK("Built-in iproxy listening on 127.0.0.1:%d", IPHONE_PORT);
+    LOGMSG_OK("Built-in iproxy listening on 127.0.0.1:%d", iphone_port);
 }
 
 void stop_iproxy(void) {
